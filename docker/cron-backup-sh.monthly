@@ -10,25 +10,25 @@ for DB_NAME in `echo $DBLIST | tr "," "\n"`;do
     ZIPFILE="/tmp/$MONTH-dump-$DB_NAME.SQL.zip"
     DBFILE="/tmp/dump-$DB_NAME.SQL"
 
-    echo -n "$NOW [$PERIOD] Dumping : $DB_HOST/$DB_NAME"
+    echo    "$NOW [$PERIOD] $DB_HOST/$DB_NAME"
+    echo -n "$NOW [$PERIOD]  └> Dumping"
     mysqldump --opt --lock-tables --user=$DB_USER --password=$DB_PASS --host=$DB_HOST $DB_NAME > $DBFILE
     if [[ -e "$DBFILE" ]]
         then
             echo -e $OK
-            echo -n "$NOW [$PERIOD] Zipping : $DB_HOST/$DB_NAME"
+            echo -n "$NOW [$PERIOD]  └> Zipping"
             zip -qq $ZIPFILE $DBFILE
             if [[ -e "$ZIPFILE" ]]
                 then
                     echo -e $OK
-                    echo -n "$NOW [$PERIOD] Sending : $DB_HOST/$DB_NAME"
+
+                    echo -n "$NOW [$PERIOD]  └> Sending"
                     sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $ZIPFILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
-                    if [[ $? -eq 0 ]]
-                        then
-                            echo -e $OK
-                        else
-                            echo -e $KO
-                    fi
+                    if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
+
+                    echo -n "$NOW [$PERIOD]  └> Cleaning"
                     rm $ZIPFILE
+                    if [ ! -f $ZIPFILE ]; then echo -e $OK; else echo -e $KO; fi
                 else
                     echo -e $KO
                 fi
