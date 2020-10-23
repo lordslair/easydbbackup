@@ -41,6 +41,16 @@ In my case I use a rsync enabled remote storage called PCA (Public Cloud Archive
 2020-10-23 12:36:03 [hourly]  └> Cleaning       [✓]
 ```
 
+Once a day, a status will be displayed with Size used & number of zip files
+```
+2020-10-23 15:21:05 ========== Remote Disk Usage Status ==========
+2020-10-23 15:21:05 [hourly]    Size: 22 MB     (Zip-files: 48)
+2020-10-23 15:21:07 [daily]     Size: 29 MB     (Zip-files: 62)
+2020-10-23 15:21:10 [weekly]    Size: 11 MB     (Zip-files: 27)
+2020-10-23 15:21:12 [monthly]   Size: 3 MB      (Zip-files: 8)
+2020-10-23 15:21:12 ==============================================
+```
+
 ### Destination folders
 
 On the remote storage `PCA_HOST`,
@@ -73,7 +83,6 @@ And of course GitHub to store all these shenanigans.
 ### Installation
 
 You can build the container yourself :
-
 ```
 $ git clone https://github.com/lordslair/easydbbackup
 $ cd docker
@@ -89,6 +98,15 @@ Digest: sha256:20a216bc9c9e5bbea2a64f1ef152ee8874dcdec5faec6a9ccfab70cb0e1c1ba7
 Status: Downloaded newer image for lordslair/easydbbackup:latest
 ```
 
+For a Kubernetes (k8s) deployment, I added examples files :  
+Of course, you'll have to modify the secrets to fit with your credentials
+```
+$ git clone https://github.com/lordslair/easydbbackup
+$ cd easydbbackup/k8s
+$ kubectl apply -f secrets.yaml
+$ kubectl apply -f deployment.yaml
+```
+
 #### Disclaimer/Reminder
 
 > Always double-check your backups and test the restoration process once in a while.  
@@ -96,8 +114,7 @@ Status: Downloaded newer image for lordslair/easydbbackup:latest
 
 ### Todos
 
- - Add more informations in logs (file sizes)
- - Add a display of remote disk used
+ - Nothing yet
 
 ---
    [kubernetes]: <https://github.com/kubernetes/kubernetes>
