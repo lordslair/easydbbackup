@@ -18,4 +18,6 @@ COPY cron-backup-sh.hourly  /etc/periodic/hourly/cron-backup-sh
 COPY cron-backup-sh.monthly /etc/periodic/monthly/cron-backup-sh
 COPY cron-backup-sh.weekly  /etc/periodic/weekly/cron-backup-sh
 
+COPY cron-status-sh.daily   /etc/periodic/daily/cron-status-sh
+
 ENTRYPOINT ["crond", "-f", "-l", "2"]

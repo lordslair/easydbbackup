@@ -1,0 +1,16 @@
+#!/bin/bash
+
+NOW=$(date +'%Y-%m-%d %H:%M:%S')
+echo "$NOW ========== Remote Disk Usage Status =========="
+
+for PERIOD in hourly daily weekly monthly;do
+    NOW=$(date +'%Y-%m-%d %H:%M:%S')
+
+    SIZEB=$(echo "ls -l" | sshpass -p "$PCA_PASS" sftp "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD" 2>1 | grep .zip | awk '{print $5}' | awk '{s+=$1} END {printf "%.0f\n", s}')
+    SIZEM=$(($SIZEB/1024/1024))
+    FILES=$(echo "ls -l" | sshpass -p "$PCA_PASS" sftp "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD" 2>1 | grep -c .zip)
+
+    echo -e "$NOW [$PERIOD]\tSize: $SIZEM MB\t(Zip-files: $FILES)"
+done;
+
+echo "$NOW =============================================="
