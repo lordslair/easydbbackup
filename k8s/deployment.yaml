@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  namespace: my-project
+  name: backend-backup
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backup
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: backup
+        tier: backend
+    spec:
+      restartPolicy: Always
+
+      containers:
+      - name: sep-backend-backup
+        image: lordslair/easydbbackup:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 32Mi
+            cpu: 50m
+          requests:
+            memory: 16Mi
+            cpu: 10m
+        env:
+          - name: DBLIST
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: dblist
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: dbhost
+          - name: DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: my-mariadb-secret
+                key: port
+          - name: DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: my-mariadb-secret
+                key: pass
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: my-mariadb-secret
+                key: user
+          - name: PCA_USER
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: pcauser
+          - name: PCA_PASS
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: pcapass
+          - name: PCA_HOST
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: pcahost
+          - name: PCA_DIR
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: pcadir
