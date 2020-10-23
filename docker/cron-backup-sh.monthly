@@ -2,21 +2,38 @@
 
 MONTH=$(date +%B)
 PERIOD='monthly'
+OK="\t[\e[92m✓\e[0m]"
+KO="\t[\e[91m✗\e[0m]"
 
 for DB_NAME in `echo $DBLIST | tr "," "\n"`;do
     NOW=$(date +'%Y-%m-%d %H:%M:%S')
     ZIPFILE="/tmp/$MONTH-dump-$DB_NAME.SQL.zip"
     DBFILE="/tmp/dump-$DB_NAME.SQL"
 
-    echo "$NOW [$PERIOD] Dumping : $DB_HOST/$DB_NAME > $DBFILE"
+    echo -n "$NOW [$PERIOD] Dumping : $DB_HOST/$DB_NAME"
     mysqldump --opt --lock-tables --user=$DB_USER --password=$DB_PASS --host=$DB_HOST $DB_NAME > $DBFILE
     if [[ -e "$DBFILE" ]]
         then
-            zip $ZIPFILE $DBFILE
-            sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $ZIPFILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
-            rm $ZIPFILE
+            echo -e $OK
+            echo -n "$NOW [$PERIOD] Zipping : $DB_HOST/$DB_NAME"
+            zip -qq $ZIPFILE $DBFILE
+            if [[ -e "$ZIPFILE" ]]
+                then
+                    echo -e $OK
+                    echo -n "$NOW [$PERIOD] Sending : $DB_HOST/$DB_NAME"
+                    sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $ZIPFILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
+                    if [[ $? -eq 0 ]]
+                        then
+                            echo -e $OK
+                        else
+                            echo -e $KO
+                    fi
+                    rm $ZIPFILE
+                else
+                    echo -e $KO
+                fi
             rm $DBFILE
         else
-            echo "$NOW [$PERIOD] WARN: Dump $DBFILE not created. Shit happened !"
+            echo -e $KO
         fi
 done;
