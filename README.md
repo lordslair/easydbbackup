@@ -1,18 +1,18 @@
 # easydbbackup, the project :
 
 This project started to have a simple and lightweight container to :
-- backup MySQL DB
-- export the dumps to a archive server accessible through rsync
+- backup MySQL/MariaDB databases
+- export the dumps to a remote archive server accessible with rsync
 
 All of this inside Docker containers for portable purposes.  
 This containers is powered up by Kubernetes
 
 ### Variables
 
-To work properly, the scripts will require informations and credentials
+To work properly, the scripts will require informations and credentials  
 We assume they are passed to the container in ENV
 
-MySQL related variables :
+MySQL/MariaDB server related variables :
 - `DBLIST`: is a list, representing the DB to backup
 - `DB_HOST`: mysql-server hostname or IP
 - `DB_PORT`: mysql-server port
