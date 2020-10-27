@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  namespace: my-project
+  name: backend-backup
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backup
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: backup
+        tier: backend
+    spec:
+      restartPolicy: Always
+
+      containers:
+      - name: backend-backup
+        image: lordslair/easydbbackup:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 32Mi
+            cpu: 50m
+          requests:
+            memory: 16Mi
+            cpu: 10m
+        env:
+          - name: SQLITE
+            value: 'True'
+          - name: SQLITE_FILE
+            value: 'sqlite3.db'
+          - name: SQLITE_PATH
+            value: '/db'
+          - name: PCA_USER
+            value: 'pca'
+          - name: PCA_HOST
+            value: 'my.pca.host'
+          - name: PCA_DIR
+            value: 'backups/sqlite'
+          - name: PCA_PASS
+            value: 'MyArchivePassword'
+        volumeMounts:
+          - mountPath: /db
+            name: db
+
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: volume-sqlite-db
