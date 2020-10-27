@@ -1,7 +1,7 @@
 # easydbbackup, the project :
 
 This project started to have a simple and lightweight container to :
-- backup MySQL/MariaDB databases
+- backup MySQL/MariaDB or SQLite databases
 - export the dumps to a remote archive server accessible with rsync
 
 All of this inside Docker containers for portable purposes.  
@@ -19,6 +19,11 @@ MySQL/MariaDB server related variables :
 - `DB_USER`: mysql-server username
 - `DB_PASS`: mysql-server password
 
+SQLite server related variables :
+- `SQLITE`: boolean, to switch to this backup type
+- `SQLITE_FILE`: sqlite database filename (ex: sqlite3.db)
+- `SQLITE_PATH`: sqlite database location (ex: /db)
+
 In my case I use a rsync enabled remote storage called PCA (Public Cloud Archive), hence the variable names
 
 - `PCA_USER`: destination rsync username
@@ -29,6 +34,7 @@ In my case I use a rsync enabled remote storage called PCA (Public Cloud Archive
 ### Output
 
 ```
+MySQL/MariaDB version
 2020-10-23 12:36:00 [hourly] my-mysql-server/my-database
 2020-10-23 12:36:00 [hourly]  └> Dumping        [✓]
 2020-10-23 12:36:00 [hourly]  └> Zipping        [✓]
@@ -39,6 +45,13 @@ In my case I use a rsync enabled remote storage called PCA (Public Cloud Archive
 2020-10-23 12:36:03 [hourly]  └> Zipping        [✓]
 2020-10-23 12:36:03 [hourly]  └> Sending        [✓]
 2020-10-23 12:36:03 [hourly]  └> Cleaning       [✓]
+
+SQLite version
+2020-10-27 14:57:43 [hourly] /db/nacridan.db
+2020-10-27 14:57:43 [hourly]  └> Dumping        [✓]
+2020-10-27 14:57:43 [hourly]  └> Zipping        [✓]
+2020-10-27 14:57:43 [hourly]  └> Sending        [✓]
+2020-10-27 14:57:43 [hourly]  └> Cleaning       [✓]
 ```
 
 Once a day, a status will be displayed with Size used & number of zip files
@@ -98,13 +111,21 @@ Digest: sha256:20a216bc9c9e5bbea2a64f1ef152ee8874dcdec5faec6a9ccfab70cb0e1c1ba7
 Status: Downloaded newer image for lordslair/easydbbackup:latest
 ```
 
-For a Kubernetes (k8s) deployment, I added examples files :  
+For a Kubernetes (k8s) deployment with MySQL/MariaDB, I added examples files :  
 Of course, you'll have to modify the secrets to fit with your credentials
 ```
 $ git clone https://github.com/lordslair/easydbbackup
 $ cd easydbbackup/k8s
 $ kubectl apply -f secrets.yaml
 $ kubectl apply -f deployment.yaml
+```
+
+For a Kubernetes (k8s) deployment with SQLite, I added examples files :  
+Of course, you'll have to modify the env vars to fit with your credentials
+```
+$ git clone https://github.com/lordslair/easydbbackup
+$ cd easydbbackup/k8s
+$ kubectl apply -f deployment-sqlite.yaml
 ```
 
 #### Disclaimer/Reminder
