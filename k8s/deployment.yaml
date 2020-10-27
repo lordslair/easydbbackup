@@ -23,7 +23,7 @@ spec:
       restartPolicy: Always
 
       containers:
-      - name: sep-backend-backup
+      - name: backend-backup
         image: lordslair/easydbbackup:latest
         imagePullPolicy: Always
         resources:
