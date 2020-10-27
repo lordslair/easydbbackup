@@ -8,6 +8,7 @@ RUN apk update --no-cache \
                                       bash \
                                       zip \
                                       mysql-client \
+                                      sqlite \
     && apk add --no-cache --virtual  .build-deps \
                                       tzdata \
     && cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
