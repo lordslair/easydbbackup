@@ -2,7 +2,7 @@
 
 This project started to have a simple and lightweight container to :
 - backup MySQL/MariaDB or SQLite databases
-- export the dumps to a remote archive server accessible with rsync
+- export the dumps to a remote archive server accessible with rsync or rclone
 
 All of this inside Docker containers for portable purposes.  
 This containers is powered up by Kubernetes
@@ -31,6 +31,10 @@ In my case I use a rsync enabled remote storage called PCA (Public Cloud Archive
 - `PCA_HOST`: destination rsync host
 - `PCA_DIR`: destination direcory to store the backups
 
+Specific variables are used for rclone copies.  
+Please refer to the corresponding `k8s/deployment-rclone.yaml` to see them all
+Hint: ALL the variables are mandatory
+
 ### Output
 
 ```
@@ -54,7 +58,8 @@ SQLite version
 2020-10-27 14:57:43 [hourly]  └> Cleaning       [✓]
 ```
 
-Once a day, a status will be displayed with Size used & number of zip files
+Once a day, a status will be displayed with Size used & number of zip files  
+This will occur, wether you use rsync or rclone
 ```
 2020-10-23 15:21:05 ========== Remote Disk Usage Status ==========
 2020-10-23 15:21:05 [hourly]    Size: 22 MB     (Zip-files: 48)
@@ -66,12 +71,12 @@ Once a day, a status will be displayed with Size used & number of zip files
 
 ### Destination folders
 
-On the remote storage `PCA_HOST`,
-the backups are stored in `PCA_DIR` are stored this way :
+On the remote storage `PCA_HOST` or the rclone remote destination  
+the backups are stored in `PCA_DIR` (or `RCLONE_CONFIG_PCS_DIR`) are stored this way :
 
 ```
 .
-└── PCA_DIR
+└── DIR
     ├── daily
     │   └── $(date +%d)-dump-$(dbname).SQL.zip
     ├── hourly
@@ -126,6 +131,14 @@ Of course, you'll have to modify the env vars to fit with your credentials
 $ git clone https://github.com/lordslair/easydbbackup
 $ cd easydbbackup/k8s
 $ kubectl apply -f deployment-sqlite.yaml
+```
+
+For a Kubernetes (k8s) deployment with MySQL/MariaDB and rclone, I added examples files :  
+Of course, you'll have to modify the env vars to fit with your credentials
+```
+$ git clone https://github.com/lordslair/easydbbackup
+$ cd easydbbackup/k8s
+$ kubectl apply -f deployment-rclone.yaml
 ```
 
 #### Disclaimer/Reminder
