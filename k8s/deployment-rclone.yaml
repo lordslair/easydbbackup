@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  namespace: my-project
+  name: backend-backup
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backup
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: backup
+        tier: backend
+    spec:
+      restartPolicy: Always
+
+      containers:
+      - name: backend-backup
+        image: lordslair/easydbbackup:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 32Mi
+            cpu: 50m
+          requests:
+            memory: 16Mi
+            cpu: 10m
+        env:
+          - name: DB_LIST
+            value: 'my-database,mysql'
+          - name: DB_HOST
+            value: 'my.mariadb.host'
+          - name: DB_PORT
+            value: '3306'
+          - name: DB_PASS
+            value: 'MySQLPassword'
+          - name: DB_USER
+            value: 'root'
+          - name: RCLONE_CONFIG_PCS_TYPE
+            value: 'swift'
+          - name: RCLONE_CONFIG_PCS_ENV_AUTH
+            value: 'false'
+          - name: RCLONE_CONFIG_PCS_AUTH_VERSION
+            value: '3'
+          - name: RCLONE_CONFIG_PCS_TENANT_DOMAIN
+            value: 'default'
+          - name: RCLONE_CONFIG_PCS_DOMAIN
+            value: 'default'
+          - name: RCLONE_CONFIG_PCS_AUTH
+            value: 'https://auth.pcs.provider/v3/'
+          - name: RCLONE_CONFIG_PCS_TENANT
+            value: 'OS_TENANT_NAME'
+          - name: RCLONE_CONFIG_PCS_USER
+            value: 'OS_USERNAME'
+          - name: RCLONE_CONFIG_PCS_KEY
+            value: 'OS_PASSWORD'
+          - name: RCLONE_CONFIG_PCS_REGION
+            value: 'OS_REGION_NAME'
+          - name: RCLONE_CONFIG_PCS_DIR
+            value: 'backups/rclone'
+        volumeMounts:
+          - mountPath: /db
+            name: db
+
+      volumes:
+        - name: db
+          persistentVolumeClaim:
+            claimName: volume-sqlite-db
