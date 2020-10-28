@@ -2,7 +2,7 @@ FROM alpine:3.12
 MAINTAINER @Lordslair
 
 RUN apk update --no-cache \
-    && apk add --no-cache             rsync \
+    && apk add --no-cache             rclone \
                                       openssh \
                                       sshpass \
                                       bash \
