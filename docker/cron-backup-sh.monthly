@@ -29,7 +29,7 @@ if [[ $SQLITE == 'True' ]]
                                 if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
                                     then
                                         echo -n "$NOW [$PERIOD]  └> Rcloning"
-                                        rclone sync $ZIPFILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
+                                        rclone --quiet sync $ZIPFILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
                                         if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                                     else
                                         echo -n "$NOW [$PERIOD]  └> Rsyncing"
@@ -70,7 +70,7 @@ for DB_NAME in `echo $DB_LIST | tr "," "\n"`;do
                     if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
                         then
                             echo -n "$NOW [$PERIOD]  └> Rcloning"
-                            rclone sync $ZIPFILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
+                            rclone --quiet sync $ZIPFILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
                             if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                         else
                             echo -n "$NOW [$PERIOD]  └> Rsyncing"
