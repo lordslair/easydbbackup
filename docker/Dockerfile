@@ -21,4 +21,6 @@ COPY cron-backup-sh.weekly  /etc/periodic/weekly/cron-backup-sh
 
 COPY cron-status-sh.daily   /etc/periodic/daily/cron-status-sh
 
+COPY redis-cli              /usr/local/bin/redis-cli
+
 ENTRYPOINT ["crond", "-f", "-l", "2"]

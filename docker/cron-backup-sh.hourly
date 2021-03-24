@@ -50,6 +50,47 @@ if [[ $SQLITE == 'True' ]]
         fi
 fi
 
+if [[ $REDIS_DUMP == 'True' ]]
+then
+    NOW=$(date +'%Y-%m-%d %H:%M:%S')
+    REDIS_ZIP_FILE="/tmp/$HOUR-dump-redis.RDB.zip"
+    REDIS_DB_FILE="/tmp/dump-redis.RDB"
+
+    echo    "$NOW [$PERIOD] $REDIS_DB_HOST"
+    echo -n "$NOW [$PERIOD]  └> Dumping"
+    redis-cli -u "redis://$REDIS_DB_HOST:$REDIS_DB_PORT" --rdb $REDIS_DB_FILE &>/dev/null
+    if [[ -e "$REDIS_DB_FILE" ]]
+    then
+        echo -e $OK
+        echo -n "$NOW [$PERIOD]  └> Zipping"
+        zip -qq $REDIS_ZIP_FILE $REDIS_DB_FILE
+        if [[ -e "$REDIS_ZIP_FILE" ]]
+        then
+            echo -e $OK
+
+            if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
+            then
+                echo -n "$NOW [$PERIOD]  └> Rcloning"
+                rclone --quiet sync $REDIS_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
+                if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
+            else
+                echo -n "$NOW [$PERIOD]  └> Rsyncing"
+                sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $REDIS_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
+                if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
+            fi
+
+            echo -n "$NOW [$PERIOD]  └> Cleaning"
+            rm $REDIS_ZIP_FILE
+            if [ ! -f $REDIS_ZIP_FILE ]; then echo -e $OK; else echo -e $KO; fi
+        else
+            echo -e $KO
+        fi
+        rm $REDIS_DB_FILE
+    else
+        echo -e $KO
+    fi
+fi
+
 for DB_NAME in `echo $DB_LIST | tr "," "\n"`;do
     NOW=$(date +'%Y-%m-%d %H:%M:%S')
     ZIPFILE="/tmp/$HOUR-dump-$DB_NAME.SQL.zip"
