@@ -21,8 +21,8 @@ MySQL/MariaDB server related variables :
 - `MYSQL_DB_PASS`: mysql-server password
 
 SQLite server related variables :
-- `SQLITE`: boolean, to switch to this backup type
-- `SQLITE_FILE`: sqlite database filename (ex: sqlite3.db)
+- `SQLITE_DUMP`: boolean, to execute this backup type
+- `SQLITE_DB`: sqlite database filename (ex: sqlite3.db)
 - `SQLITE_PATH`: sqlite database location (ex: /db)
 
 Redis server related variables :

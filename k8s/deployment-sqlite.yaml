@@ -34,9 +34,9 @@ spec:
             memory: 16Mi
             cpu: 10m
         env:
-          - name: SQLITE
+          - name: SQLITE_DUMP
             value: 'True'
-          - name: SQLITE_FILE
+          - name: SQLITE_DB
             value: 'sqlite3.db'
           - name: SQLITE_PATH
             value: '/db'
