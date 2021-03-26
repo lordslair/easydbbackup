@@ -79,3 +79,20 @@ spec:
               secretKeyRef:
                 name: my-backup-secret
                 key: pcadir
+
+          # Redis related variables
+          - name: REDIS_DUMP
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: redis-dump
+          - name: REDIS_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: my-redis-secret
+                key: redis-host
+          - name: REDIS_DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: my-redis-secret
+                key: redis-port

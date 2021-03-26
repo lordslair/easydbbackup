@@ -24,6 +24,11 @@ SQLite server related variables :
 - `SQLITE_FILE`: sqlite database filename (ex: sqlite3.db)
 - `SQLITE_PATH`: sqlite database location (ex: /db)
 
+Redis server related variables :
+- `REDIS_DUMP`: boolean, to execute this backup type
+- `REDIS_DB_HOST`: redis-server hostname or IP
+- `REDIS_DB_PORT`: redis-server port
+
 In my case I use a rsync enabled remote storage called PCA (Public Cloud Archive), hence the variable names
 
 - `PCA_USER`: destination rsync username
@@ -49,6 +54,13 @@ MySQL/MariaDB version
 2020-10-23 12:36:03 [hourly]  └> Zipping        [✓]
 2020-10-23 12:36:03 [hourly]  └> Sending        [✓]
 2020-10-23 12:36:03 [hourly]  └> Cleaning       [✓]
+
+Redis version
+2021-03-26 12:48:27 [hourly] my-redis-server
+2021-03-26 12:48:27 [hourly]  └> Dumping        [✓]
+2021-03-26 12:48:27 [hourly]  └> Zipping        [✓]
+2021-03-26 12:48:27 [hourly]  └> Rcloning       [✓]
+2021-03-26 12:48:27 [hourly]  └> Cleaning       [✓]
 
 SQLite version
 2020-10-27 14:57:43 [hourly] /db/nacridan.db
