@@ -34,15 +34,17 @@ spec:
             memory: 16Mi
             cpu: 10m
         env:
-          - name: DB_LIST
+          - name: MYSQL_DUMP
+            value: 'True'
+          - name: MYSQL_DB_LIST
             value: 'my-database,mysql'
-          - name: DB_HOST
+          - name: MYSQL_DB_HOST
             value: 'my.mariadb.host'
-          - name: DB_PORT
+          - name: MYSQL_DB_PORT
             value: '3306'
-          - name: DB_PASS
+          - name: MYSQL_DB_PASS
             value: 'MySQLPassword'
-          - name: DB_USER
+          - name: MYSQL_DB_USER
             value: 'root'
           - name: RCLONE_CONFIG_PCS_TYPE
             value: 'swift'
