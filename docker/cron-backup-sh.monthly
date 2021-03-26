@@ -91,43 +91,45 @@ then
     fi
 fi
 
+if [[ $MYSQL_DUMP == 'True' ]]
+then
+    for MYSQL_DB in `echo $MYSQL_DB_LIST | tr "," "\n"`;do
+        NOW=$(date +'%Y-%m-%d %H:%M:%S')
+        MYSQL_ZIP_FILE="/tmp/$MONTH-dump-$MYSQL_DB.SQL.zip"
+        MYSQL_DB_FILE="/tmp/dump-$MYSQL_DB.SQL"
 
-for DB_NAME in `echo $DB_LIST | tr "," "\n"`;do
-    NOW=$(date +'%Y-%m-%d %H:%M:%S')
-    ZIPFILE="/tmp/$MONTH-dump-$DB_NAME.SQL.zip"
-    DBFILE="/tmp/dump-$DB_NAME.SQL"
-
-    echo    "$NOW [$PERIOD] $DB_HOST/$DB_NAME"
-    echo -n "$NOW [$PERIOD]  └> Dumping"
-    mysqldump --opt --lock-tables --user=$DB_USER --password=$DB_PASS --host=$DB_HOST $DB_NAME > $DBFILE
-    if [[ -e "$DBFILE" ]]
+        echo    "$NOW [$PERIOD] $MYSQL_DB_HOST/$MYSQL_DB"
+        echo -n "$NOW [$PERIOD]  └> Dumping"
+        mysqldump --opt --lock-tables --user=$MYSQL_DB_USER --password=$MYSQL_DB_PASS --host=$MYSQL_DB_HOST $MYSQL_DB > $MYSQL_DB_FILE
+        if [[ -e "$MYSQL_DB_FILE" ]]
         then
             echo -e $OK
             echo -n "$NOW [$PERIOD]  └> Zipping"
-            zip -qq $ZIPFILE $DBFILE
-            if [[ -e "$ZIPFILE" ]]
+            zip -qq $MYSQL_ZIP_FILE $MYSQL_DB_FILE
+            if [[ -e "$MYSQL_ZIP_FILE" ]]
+            then
+                echo -e $OK
+
+                if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
                 then
-                    echo -e $OK
-
-                    if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
-                        then
-                            echo -n "$NOW [$PERIOD]  └> Rcloning"
-                            rclone --quiet sync $ZIPFILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
-                            if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
-                        else
-                            echo -n "$NOW [$PERIOD]  └> Rsyncing"
-                            sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $ZIPFILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
-                            if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
-                    fi
-
-                    echo -n "$NOW [$PERIOD]  └> Cleaning"
-                    rm $ZIPFILE
-                    if [ ! -f $ZIPFILE ]; then echo -e $OK; else echo -e $KO; fi
+                    echo -n "$NOW [$PERIOD]  └> Rcloning"
+                    rclone --quiet sync $MYSQL_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
+                    if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                 else
-                    echo -e $KO
+                    echo -n "$NOW [$PERIOD]  └> Rsyncing"
+                    sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $MYSQL_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
+                    if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                 fi
-            rm $DBFILE
+
+                echo -n "$NOW [$PERIOD]  └> Cleaning"
+                rm $MYSQL_ZIP_FILE
+                if [ ! -f $MYSQL_ZIP_FILE ]; then echo -e $OK; else echo -e $KO; fi
+            else
+                echo -e $KO
+            fi
+            rm $MYSQL_DB_FILE
         else
             echo -e $KO
         fi
-done;
+    done;
+fi
