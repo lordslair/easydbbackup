@@ -13,11 +13,12 @@ To work properly, the scripts will require informations and credentials
 We assume they are passed to the container in ENV
 
 MySQL/MariaDB server related variables :
-- `DBLIST`: is a list, representing the DB to backup
-- `DB_HOST`: mysql-server hostname or IP
-- `DB_PORT`: mysql-server port
-- `DB_USER`: mysql-server username
-- `DB_PASS`: mysql-server password
+- `MYSQL_DUMP`: boolean, to execute this backup type
+- `MYSQL_DBLIST`: is a list, representing the DB to backup
+- `MYSQL_DB_HOST`: mysql-server hostname or IP
+- `MYSQL_DB_PORT`: mysql-server port
+- `MYSQL_DB_USER`: mysql-server username
+- `MYSQL_DB_PASS`: mysql-server password
 
 SQLite server related variables :
 - `SQLITE`: boolean, to switch to this backup type

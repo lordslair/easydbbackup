@@ -34,31 +34,38 @@ spec:
             memory: 16Mi
             cpu: 10m
         env:
-          - name: DB_LIST
+          # MySQL/MarisDB related variables
+          - name: MYSQL_DUMP
             valueFrom:
               secretKeyRef:
                 name: my-backup-secret
-                key: dblist
-          - name: DB_HOST
+                key: mysql-dump
+          - name: MySQL_DB_LIST
             valueFrom:
               secretKeyRef:
                 name: my-backup-secret
-                key: dbhost
-          - name: DB_PORT
+                key: mysql-dblist
+          - name: MySQL_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: mysql-dbhost
+          - name: MySQL_DB_PORT
             valueFrom:
               secretKeyRef:
                 name: my-mariadb-secret
-                key: port
-          - name: DB_PASS
+                key: mysql-port
+          - name: MySQL_DB_PASS
             valueFrom:
               secretKeyRef:
                 name: my-mariadb-secret
-                key: pass
-          - name: DB_USER
+                key: mysql-pass
+          - name: MySQL_DB_USER
             valueFrom:
               secretKeyRef:
                 name: my-mariadb-secret
-                key: user
+                key: mysql-user
+
           - name: PCA_USER
             valueFrom:
               secretKeyRef:
