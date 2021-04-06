@@ -6,48 +6,48 @@ OK="\t[\e[92m✓\e[0m]"
 KO="\t[\e[91m✗\e[0m]"
 
 if [[ $SQLITE_DUMP == 'True' ]]
+then
+    NOW=$(date +'%Y-%m-%d %H:%M:%S')
+    SQLITE_DB_FILE="/tmp/$DAY-dump-$SQLITE_DB.SQL"
+    SQLITE_ZIP_FILE="/tmp/$DAY-dump-$SQLITE_DB.SQL.zip"
+
+    if [[ -e "$SQLITE_PATH/$SQLITE_DB" ]]
     then
-        NOW=$(date +'%Y-%m-%d %H:%M:%S')
-        SQLITE_DB_FILE="/tmp/$DAY-dump-$SQLITE_DB.SQL"
-        SQLITE_ZIP_FILE="/tmp/$DAY-dump-$SQLITE_DB.SQL.zip"
-
-        if [[ -e "$SQLITE_PATH/$SQLITE_DB" ]]
+        echo    "$NOW [$PERIOD] $SQLITE_PATH/$SQLITE_DB"
+        echo -n "$NOW [$PERIOD]  └> Dumping"
+        cp -a "$SQLITE_PATH/$SQLITE_DB" /tmp/
+        sqlite3 "/tmp/$SQLITE_DB" .dump > $SQLITE_DB_FILE
+        if [[ -e "$SQLITE_DB_FILE" ]]
+        then
+            echo -e $OK
+            echo -n "$NOW [$PERIOD]  └> Zipping"
+            zip -qq $SQLITE_ZIP_FILE $SQLITE_DB_FILE
+            if [[ -e "$SQLITE_ZIP_FILE" ]]
             then
-                echo    "$NOW [$PERIOD] $SQLITE_PATH/$SQLITE_DB"
-                echo -n "$NOW [$PERIOD]  └> Dumping"
-                cp -a "$SQLITE_PATH/$SQLITE_DB" /tmp/
-                sqlite3 "/tmp/$SQLITE_DB" .dump > $SQLITE_DB_FILE
-                if [[ -e "$SQLITE_DB_FILE" ]]
-                    then
-                        echo -e $OK
-                        echo -n "$NOW [$PERIOD]  └> Zipping"
-                        zip -qq $SQLITE_ZIP_FILE $SQLITE_DB_FILE
-                        if [[ -e "$SQLITE_ZIP_FILE" ]]
-                            then
-                                echo -e $OK
+                echo -e $OK
 
-                                if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
-                                    then
-                                        echo -n "$NOW [$PERIOD]  └> Rcloning"
-                                        rclone --quiet sync $SQLITE_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
-                                        if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
-                                    else
-                                        echo -n "$NOW [$PERIOD]  └> Rsyncing"
-                                        sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $SQLITE_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
-                                        if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
-                                fi
-
-                                echo -n "$NOW [$PERIOD]  └> Cleaning"
-                                rm $SQLITE_ZIP_FILE "/tmp/$SQLITE_DB"
-                                if [ ! -f $SQLITE_ZIP_FILE ]; then echo -e $OK; else echo -e $KO; fi
-                            else
-                                echo -e $KO
-                            fi
-                        rm $SQLITE_DB_FILE
-                    else
-                        echo -e $KO
+                if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
+                then
+                    echo -n "$NOW [$PERIOD]  └> Rcloning"
+                    rclone --quiet sync $SQLITE_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
+                    if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
+                else
+                    echo -n "$NOW [$PERIOD]  └> Rsyncing"
+                    sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $SQLITE_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
+                    if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                 fi
+
+                echo -n "$NOW [$PERIOD]  └> Cleaning"
+                rm $SQLITE_ZIP_FILE "/tmp/$SQLITE_DB"
+                if [ ! -f $SQLITE_ZIP_FILE ]; then echo -e $OK; else echo -e $KO; fi
+            else
+                echo -e $KO
+            fi
+            rm $SQLITE_DB_FILE
+        else
+            echo -e $KO
         fi
+    fi
 fi
 
 if [[ $REDIS_DUMP == 'True' ]]
