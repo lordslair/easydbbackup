@@ -11,8 +11,10 @@ RUN apk update --no-cache \
                                       sshpass \
                                       zip \
     && apk add --no-cache --virtual  .build-deps \
+                                      redis \
                                       tzdata \
-    && cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
+    && cp -a /usr/share/zoneinfo/Europe/Paris /etc/localtime \
+    && cp -a /usr/bin/redis-cli /usr/local/bin/ \
     && apk del .build-deps
 
 COPY cron-backup-sh.daily   /etc/periodic/daily/cron-backup-sh
@@ -21,7 +23,5 @@ COPY cron-backup-sh.monthly /etc/periodic/monthly/cron-backup-sh
 COPY cron-backup-sh.weekly  /etc/periodic/weekly/cron-backup-sh
 
 COPY cron-status-sh.daily   /etc/periodic/daily/cron-status-sh
-
-COPY redis-cli              /usr/local/bin/redis-cli
 
 ENTRYPOINT ["crond", "-f", "-l", "2"]
