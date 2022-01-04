@@ -2,14 +2,14 @@ FROM alpine:3.15
 MAINTAINER @Lordslair
 
 RUN apk update --no-cache \
-    && apk add --no-cache             rclone \
-                                      openssh \
-                                      sshpass \
-                                      bash \
-                                      zip \
+    && apk add --no-cache             bash \
                                       mariadb-connector-c \
                                       mysql-client \
+                                      openssh \
+                                      rclone \
                                       sqlite \
+                                      sshpass \
+                                      zip \
     && apk add --no-cache --virtual  .build-deps \
                                       tzdata \
     && cp /usr/share/zoneinfo/Europe/Paris /etc/localtime \
