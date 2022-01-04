@@ -100,7 +100,7 @@ then
 
         echo    "$NOW [$PERIOD] $MYSQL_DB_HOST/$MYSQL_DB"
         echo -n "$NOW [$PERIOD]  └> Dumping"
-        mysqldump --opt --lock-tables --user=$MYSQL_DB_USER --password=$MYSQL_DB_PASS --host=$MYSQL_DB_HOST $MYSQL_DB > $MYSQL_DB_FILE
+        mysqldump --opt --lock-tables --user=$MYSQL_DB_USER --password=$MYSQL_DB_PASS --host=$MYSQL_DB_HOST --port=$MYSQL_DB_PORT $MYSQL_DB > $MYSQL_DB_FILE
         if [[ -e "$MYSQL_DB_FILE" ]]
         then
             echo -e $OK
