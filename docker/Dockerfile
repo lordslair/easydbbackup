@@ -7,6 +7,7 @@ RUN apk update --no-cache \
                                       sshpass \
                                       bash \
                                       zip \
+                                      mariadb-connector-c \
                                       mysql-client \
                                       sqlite \
     && apk add --no-cache --virtual  .build-deps \
