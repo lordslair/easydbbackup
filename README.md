@@ -1,7 +1,7 @@
 # easydbbackup, the project :
 
 This project started to have a simple and lightweight container to :
-- backup MySQL/MariaDB or SQLite databases
+- backup MySQL/MariaDB, Redis, or SQLite databases
 - export the dumps to a remote archive server accessible with rsync or rclone
 
 All of this inside Docker containers for portable purposes.  
@@ -64,7 +64,7 @@ Redis version
 2021-03-26 12:48:27 [hourly]  └> Cleaning       [✓]
 
 SQLite version
-2020-10-27 14:57:43 [hourly] /db/nacridan.db
+2020-10-27 14:57:43 [hourly] /db/sqlite3.db
 2020-10-27 14:57:43 [hourly]  └> Dumping        [✓]
 2020-10-27 14:57:43 [hourly]  └> Zipping        [✓]
 2020-10-27 14:57:43 [hourly]  └> Sending        [✓]
@@ -74,12 +74,20 @@ SQLite version
 Once a day, a status will be displayed with Size used & number of zip files  
 This will occur, wether you use rsync or rclone
 ```
-2020-10-23 15:21:05 ========== Remote Disk Usage Status ==========
-2020-10-23 15:21:05 [hourly]    Size: 22 MB     (Zip-files: 48)
-2020-10-23 15:21:07 [daily]     Size: 29 MB     (Zip-files: 62)
-2020-10-23 15:21:10 [weekly]    Size: 11 MB     (Zip-files: 27)
-2020-10-23 15:21:12 [monthly]   Size: 3 MB      (Zip-files: 8)
-2020-10-23 15:21:12 ==============================================
+2022-01-05 09:41:43 ============ Remote Disk Usage Status ============
+2022-01-05 09:41:43 [hourly][MySQL]     Size: 30 MB      (Zip-files: 3)
+2022-01-05 09:41:43 [hourly][Redis]     Size: 10 MB      (Zip-files: 3)
+2022-01-05 09:41:43 [hourly][TOTAL]     Size: 40 MB      (Zip-files: 6)
+2022-01-05 09:41:55 [daily][MySQL]      Size:  5 MB      (Zip-files: 1)
+2022-01-05 09:41:55 [daily][Redis]      Size:  1 MB      (Zip-files: 1)
+2022-01-05 09:41:55 [daily][TOTAL]      Size:  6 MB      (Zip-files: 2)
+2022-01-05 09:42:04 [weekly][MySQL]     Size:  5 MB      (Zip-files: 1)
+2022-01-05 09:42:04 [weekly][Redis]     Size:  1 MB      (Zip-files: 1)
+2022-01-05 09:42:04 [weekly][TOTAL]     Size:  6 MB      (Zip-files: 2)
+2022-01-05 09:42:14 [monthly][MySQL]    Size:  5 MB      (Zip-files: 1)
+2022-01-05 09:42:14 [monthly][Redis]    Size:  1 MB      (Zip-files: 1)
+2022-01-05 09:42:14 [monthly][TOTAL]    Size:  6 MB      (Zip-files: 2)
+2022-01-05 09:42:14 ==================================================
 ```
 
 ### Destination folders
@@ -90,19 +98,24 @@ the backups are stored in `PCA_DIR` (or `RCLONE_CONFIG_PCS_DIR`) are stored this
 ```
 .
 └── DIR
-    ├── daily
-    │   └── $(date +%d)-dump-$(dbname).SQL.zip
-    ├── hourly
-    │   └── $(date +%H)-dump-$(dbname).SQL.zip
-    ├── monthly
-    │   └── $(date +%B)-dump-$(dbname).SQL.zip
-    └── weekly
-        └── $(date +%W)-dump-$(dbname).SQL.zip
+    ├── MySQL
+    │  ├── daily
+    │  │   └── $(date +%d)-dump-$(dbname).SQL.zip
+    │  ├── hourly
+    │  │   └── $(date +%H)-dump-$(dbname).SQL.zip
+    │  ├── monthly
+    │  │   └── $(date +%B)-dump-$(dbname).SQL.zip
+    │  └── weekly
+    │      └── $(date +%W)-dump-$(dbname).SQL.zip
+    ├── Redis
+    │  └── ...
+    └── SQLite
+       └── ...    
 ```
 
 ### Tech
 
-I used mainy :
+I used mainly :
 
 * Bash
 * [docker/docker-ce][docker] to make it easy to maintain

@@ -1,23 +1,32 @@
 #!/bin/bash
 
 NOW=$(date +'%Y-%m-%d %H:%M:%S')
-echo "$NOW ========== Remote Disk Usage Status =========="
+echo "$NOW ============ Remote Disk Usage Status ============"
 
 for PERIOD in hourly daily weekly monthly;do
     NOW=$(date +'%Y-%m-%d %H:%M:%S')
+    SIZET=0
+    FILET=0
 
-    if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
+    for ENGINE in SQLite MySQL Redis;do
+        if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
         then
-            SIZEB=$(rclone --quiet size pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD" | grep size | awk '{print $5}' | sed -e 's/(//')
-            FILES=$(rclone --quiet size pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD" | grep objects | awk '{print $3}')
+            SIZEB=$(rclone --quiet size pcs:"$RCLONE_CONFIG_PCS_DIR"/"$ENGINE"/"$PERIOD" | grep size | awk '{print $5}' | sed -e 's/(//')
+            FILES=$(rclone --quiet size pcs:"$RCLONE_CONFIG_PCS_DIR"/"$ENGINE"/"$PERIOD" | grep objects | awk '{print $3}')
         else
-            SIZEB=$(echo "ls -l" | sshpass -p "$PCA_PASS" sftp "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD" 2>1 | grep .zip | awk '{print $5}' | awk '{s+=$1} END {printf "%.0f\n", s}')
-            FILES=$(echo "ls -l" | sshpass -p "$PCA_PASS" sftp "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD" 2>1 | grep -c .zip)
-    fi
+            SIZEB=$(echo "ls -l" | sshpass -p "$PCA_PASS" sftp "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$ENGINE"/"$PERIOD" 2>1 | grep .zip | awk '{print $5}' | awk '{s+=$1} END {printf "%.0f\n", s}')
+            FILES=$(echo "ls -l" | sshpass -p "$PCA_PASS" sftp "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$ENGINE"/"$PERIOD" 2>1 | grep -c .zip)
+        fi
+        if [[ $FILES > 0 ]]
+        then
+          SIZEM=$(($SIZEB/1024/1024))
+          SIZET=$(($SIZET + $SIZEM))
+          FILET=$(($FILET + $FILES))
+          echo -e "$NOW [$PERIOD][$ENGINE]\tSize: $SIZEM MB\t(Zip-files: $FILES)"
+        fi
+    done;
 
-    SIZEM=$(($SIZEB/1024/1024))
-
-    echo -e "$NOW [$PERIOD]\tSize: $SIZEM MB\t(Zip-files: $FILES)"
+    echo -e "$NOW [$PERIOD][TOTAL]\tSize: $SIZET MB\t(Zip-files: $FILET)"
 done;
 
-echo "$NOW =============================================="
+echo "$NOW =================================================="

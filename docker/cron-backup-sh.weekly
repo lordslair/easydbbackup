@@ -10,6 +10,7 @@ then
     NOW=$(date +'%Y-%m-%d %H:%M:%S')
     SQLITE_DB_FILE="/tmp/$WEEK-dump-$SQLITE_DB.SQL"
     SQLITE_ZIP_FILE="/tmp/$WEEK-dump-$SQLITE_DB.SQL.zip"
+    ENGINE="SQLite"
 
     if [[ -e "$SQLITE_PATH/$SQLITE_DB" ]]
     then
@@ -29,11 +30,11 @@ then
                 if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
                 then
                     echo -n "$NOW [$PERIOD]  └> Rcloning"
-                    rclone --quiet sync $SQLITE_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
+                    rclone --quiet sync $SQLITE_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$ENGINE"/"$PERIOD"/
                     if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                 else
                     echo -n "$NOW [$PERIOD]  └> Rsyncing"
-                    sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $SQLITE_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
+                    sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $SQLITE_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$ENGINE"/"$PERIOD"/
                     if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                 fi
 
@@ -55,6 +56,7 @@ then
     NOW=$(date +'%Y-%m-%d %H:%M:%S')
     REDIS_ZIP_FILE="/tmp/$WEEK-dump-redis.RDB.zip"
     REDIS_DB_FILE="/tmp/dump-redis.RDB"
+    ENGINE="Redis"
 
     echo    "$NOW [$PERIOD] $REDIS_DB_HOST"
     echo -n "$NOW [$PERIOD]  └> Dumping"
@@ -71,11 +73,11 @@ then
             if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
             then
                 echo -n "$NOW [$PERIOD]  └> Rcloning"
-                rclone --quiet sync $REDIS_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
+                rclone --quiet sync $REDIS_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$ENGINE"/"$PERIOD"/
                 if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
             else
                 echo -n "$NOW [$PERIOD]  └> Rsyncing"
-                sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $REDIS_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
+                sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $REDIS_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$ENGINE"/"$PERIOD"/
                 if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
             fi
 
@@ -97,6 +99,7 @@ then
         NOW=$(date +'%Y-%m-%d %H:%M:%S')
         MYSQL_ZIP_FILE="/tmp/$WEEK-dump-$MYSQL_DB.SQL.zip"
         MYSQL_DB_FILE="/tmp/dump-$MYSQL_DB.SQL"
+        ENGINE="MySQL"
 
         echo    "$NOW [$PERIOD] $MYSQL_DB_HOST/$MYSQL_DB"
         echo -n "$NOW [$PERIOD]  └> Dumping"
@@ -113,11 +116,11 @@ then
                 if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
                 then
                     echo -n "$NOW [$PERIOD]  └> Rcloning"
-                    rclone --quiet sync $MYSQL_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$PERIOD"/
+                    rclone --quiet sync $MYSQL_ZIP_FILE pcs:"$RCLONE_CONFIG_PCS_DIR"/"$ENGINE"/"$PERIOD"/
                     if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                 else
                     echo -n "$NOW [$PERIOD]  └> Rsyncing"
-                    sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $MYSQL_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$PERIOD"/
+                    sshpass -p "$PCA_PASS" rsync -e "ssh -o StrictHostKeyChecking=no" -a $MYSQL_ZIP_FILE "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$ENGINE"/"$PERIOD"/
                     if [[ $? -eq 0 ]]; then echo -e $OK; else echo -e $KO; fi
                 fi
 
