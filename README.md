@@ -72,7 +72,7 @@ SQLite version
 ```
 
 Once a day, a status will be displayed with Size used & number of zip files  
-This will occur, wether you use rsync or rclone
+This will occur, whether you use rsync or rclone
 ```
 2022-01-05 09:41:43 ============ Remote Disk Usage Status ============
 2022-01-05 09:41:43 [hourly][MySQL]     Size: 30 MB      (Zip-files: 3)
@@ -129,7 +129,7 @@ And of course GitHub to store all these shenanigans.
 You can build the container yourself :
 ```
 $ git clone https://github.com/lordslair/easydbbackup
-$ cd docker
+$ cd easydbbackup
 $ docker build .
 ```
 
