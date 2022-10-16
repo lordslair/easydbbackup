@@ -1,12 +1,42 @@
 #!/bin/bash
 
-NOW=$(date +'%Y-%m-%d %H:%M:%S')
-echo "$NOW ============ Remote Disk Usage Status ============"
+# Parsing ENV to setup display options
+# LOG_INFO
+if [[ $LOG_INFO == 'True' ]]
+then
+    LOG='level=INFO '
+else
+    LOG=''
+fi
+# LOG_DATE
+if [[ $LOG_DATE == 'True' ]]
+then
+    NOW=$(date +'[%Y-%m-%d %H:%M:%S] ')
+else
+    NOW=''
+fi
+
+echo "$NOW$LOG|-----------------------------------|"
+echo "$NOW$LOG|        Remote Usage Status        |"
+echo "$NOW$LOG|-----------------------------------|"
+echo "$NOW$LOG|  Period | Engine |    Size | ZIPs |"
+echo "$NOW$LOG|---------|--------|---------|------|"
+
+# Variables Initialization
+SIZETT=0
+FILETT=0
 
 for PERIOD in hourly daily weekly monthly;do
-    NOW=$(date +'%Y-%m-%d %H:%M:%S')
-    SIZET=0
-    FILET=0
+  # LOG_DATE
+  if [[ $LOG_DATE == 'True' ]]
+  then
+      NOW=$(date +'[%Y-%m-%d %H:%M:%S] ')
+  else
+      NOW=''
+  fi
+  # Variables Initialization
+  SIZET=0
+  FILET=0
 
     for ENGINE in SQLite MySQL Redis;do
         if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
@@ -22,11 +52,17 @@ for PERIOD in hourly daily weekly monthly;do
           SIZEM=$(($SIZEB/1024/1024))
           SIZET=$(($SIZET + $SIZEM))
           FILET=$(($FILET + $FILES))
-          echo -e "$NOW [$PERIOD][$ENGINE]\tSize: $SIZEM MB\t(Zip-files: $FILES)"
+          SIZETT=$(($SIZETT + $SIZEM))
+          FILETT=$(($FILETT + $FILES))
+#          echo -e "$LOG$NOW $PERIOD \t $ENGINE\tSize: $SIZEM MB\t(Zip-files: $FILES)"
+
+          printf "$NOW$LOG| %7s | %6s | %4s MB | %4s |\n" $PERIOD $ENGINE $SIZEM $FILES
         fi
     done;
 
-    echo -e "$NOW [$PERIOD][TOTAL]\tSize: $SIZET MB\t(Zip-files: $FILET)"
+    printf "$NOW$LOG|         |  TOTAL | %4s MB | %4s |\n" $SIZET $FILET
+    #echo -e "$NOW[$PERIOD][TOTAL]\tSize: $SIZET MB\t(Zip-files: $FILET)"
 done;
-
-echo "$NOW =================================================="
+echo "$NOW$LOG|---------|--------|---------|------|"
+printf "$NOW$LOG|                  | %4s MB | %4s |\n" $SIZETT $FILETT
+echo "$NOW$LOG|-----------------------------------|"
