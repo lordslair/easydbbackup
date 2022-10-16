@@ -12,6 +12,10 @@ This containers is powered up by Kubernetes
 To work properly, the scripts will require informations and credentials  
 We assume they are passed to the container in ENV
 
+Logging related variables:
+- `LOG_DATE`: boolean, to output current date in logs
+- `LOG_INFO`: boolean, to output loglevel in logs
+
 MySQL/MariaDB server related variables :
 - `MYSQL_DUMP`: boolean, to execute this backup type
 - `MYSQL_DBLIST`: is a list, representing the DB to backup
@@ -43,51 +47,59 @@ Hint: ALL the variables are mandatory
 
 ### Output
 
+Here are the outputs with ENV vars `LOG_INFO` and `LOG_DATE` set to `True`
+
 ```
 MySQL/MariaDB version
-2020-10-23 12:36:00 [hourly] my-mysql-server/my-database
-2020-10-23 12:36:00 [hourly]  └> Dumping        [✓]
-2020-10-23 12:36:00 [hourly]  └> Zipping        [✓]
-2020-10-23 12:36:00 [hourly]  └> Sending        [✓]
-2020-10-23 12:36:00 [hourly]  └> Cleaning       [✓]
-2020-10-23 12:36:03 [hourly] my-mysql-server/mysql
-2020-10-23 12:36:03 [hourly]  └> Dumping        [✓]
-2020-10-23 12:36:03 [hourly]  └> Zipping        [✓]
-2020-10-23 12:36:03 [hourly]  └> Sending        [✓]
-2020-10-23 12:36:03 [hourly]  └> Cleaning       [✓]
+[2022-10-16 22:58:40] level=INFO | [hourly] my-mysql-server/my-database
+[2022-10-16 22:58:40] level=INFO | [hourly]  └>  Dumping [✓]
+[2022-10-16 22:58:40] level=INFO | [hourly]  └>  Zipping [✓]
+[2022-10-16 22:58:40] level=INFO | [hourly]  └> Rcloning [✓]
+[2022-10-16 22:58:40] level=INFO | [hourly]  └> Cleaning [✓]
+[2022-10-16 22:58:42] level=INFO | [hourly] my-mysql-server/mysql
+[2022-10-16 22:58:42] level=INFO | [hourly]  └>  Dumping [✓]
+[2022-10-16 22:58:42] level=INFO | [hourly]  └>  Zipping [✓]
+[2022-10-16 22:58:42] level=INFO | [hourly]  └> Rcloning [✓]
+[2022-10-16 22:58:42] level=INFO | [hourly]  └> Cleaning [✓]
 
 Redis version
-2021-03-26 12:48:27 [hourly] my-redis-server
-2021-03-26 12:48:27 [hourly]  └> Dumping        [✓]
-2021-03-26 12:48:27 [hourly]  └> Zipping        [✓]
-2021-03-26 12:48:27 [hourly]  └> Rcloning       [✓]
-2021-03-26 12:48:27 [hourly]  └> Cleaning       [✓]
+[2022-10-16 23:00:08] level=INFO | [daily] sep-backend-redis-svc
+[2022-10-16 23:00:08] level=INFO | [daily]  └>  Dumping [✓]
+[2022-10-16 23:00:08] level=INFO | [daily]  └>  Zipping [✓]
+[2022-10-16 23:00:08] level=INFO | [daily]  └> Rcloning [✓]
+[2022-10-16 23:00:08] level=INFO | [daily]  └> Cleaning [✓]
 
 SQLite version
-2020-10-27 14:57:43 [hourly] /db/sqlite3.db
-2020-10-27 14:57:43 [hourly]  └> Dumping        [✓]
-2020-10-27 14:57:43 [hourly]  └> Zipping        [✓]
-2020-10-27 14:57:43 [hourly]  └> Sending        [✓]
-2020-10-27 14:57:43 [hourly]  └> Cleaning       [✓]
+[2022-10-16 23:00:12] level=INFO | [daily] /db/sqlite3.db
+[2022-10-16 23:00:12] level=INFO | [daily]  └>  Dumping [✓]
+[2022-10-16 23:00:12] level=INFO | [daily]  └>  Zipping [✓]
+[2022-10-16 23:00:12] level=INFO | [daily]  └> Rcloning [✓]
+[2022-10-16 23:00:12] level=INFO | [daily]  └> Cleaning [✓]
 ```
 
 Once a day, a status will be displayed with Size used & number of zip files  
 This will occur, whether you use rsync or rclone
 ```
-2022-01-05 09:41:43 ============ Remote Disk Usage Status ============
-2022-01-05 09:41:43 [hourly][MySQL]     Size: 30 MB      (Zip-files: 3)
-2022-01-05 09:41:43 [hourly][Redis]     Size: 10 MB      (Zip-files: 3)
-2022-01-05 09:41:43 [hourly][TOTAL]     Size: 40 MB      (Zip-files: 6)
-2022-01-05 09:41:55 [daily][MySQL]      Size:  5 MB      (Zip-files: 1)
-2022-01-05 09:41:55 [daily][Redis]      Size:  1 MB      (Zip-files: 1)
-2022-01-05 09:41:55 [daily][TOTAL]      Size:  6 MB      (Zip-files: 2)
-2022-01-05 09:42:04 [weekly][MySQL]     Size:  5 MB      (Zip-files: 1)
-2022-01-05 09:42:04 [weekly][Redis]     Size:  1 MB      (Zip-files: 1)
-2022-01-05 09:42:04 [weekly][TOTAL]     Size:  6 MB      (Zip-files: 2)
-2022-01-05 09:42:14 [monthly][MySQL]    Size:  5 MB      (Zip-files: 1)
-2022-01-05 09:42:14 [monthly][Redis]    Size:  1 MB      (Zip-files: 1)
-2022-01-05 09:42:14 [monthly][TOTAL]    Size:  6 MB      (Zip-files: 2)
-2022-01-05 09:42:14 ==================================================
+[2022-10-16 22:12:41] level=INFO |-----------------------------------|
+[2022-10-16 22:12:41] level=INFO |        Remote Usage Status        |
+[2022-10-16 22:12:41] level=INFO |-----------------------------------|
+[2022-10-16 22:12:41] level=INFO |  Period | Engine |    Size | ZIPs |
+[2022-10-16 22:12:41] level=INFO |---------|--------|---------|------|
+[2022-10-16 22:12:41] level=INFO |  hourly |  MySQL |   58 MB |   21 |
+[2022-10-16 22:12:41] level=INFO |  hourly |  Redis |    0 MB |    7 |
+[2022-10-16 22:12:41] level=INFO |         |  TOTAL |   58 MB |   28 |
+[2022-10-16 22:12:54] level=INFO |   daily |  MySQL |    8 MB |    3 |
+[2022-10-16 22:12:54] level=INFO |   daily |  Redis |    0 MB |    1 |
+[2022-10-16 22:12:54] level=INFO |         |  TOTAL |    8 MB |    4 |
+[2022-10-16 22:13:03] level=INFO |  weekly |  MySQL |    8 MB |    3 |
+[2022-10-16 22:13:03] level=INFO |  weekly |  Redis |    0 MB |    1 |
+[2022-10-16 22:13:03] level=INFO |         |  TOTAL |    8 MB |    4 |
+[2022-10-16 22:13:12] level=INFO | monthly |  MySQL |    8 MB |    3 |
+[2022-10-16 22:13:12] level=INFO | monthly |  Redis |    0 MB |    1 |
+[2022-10-16 22:13:12] level=INFO |         |  TOTAL |    8 MB |    4 |
+[2022-10-16 22:13:12] level=INFO |---------|--------|---------|------|
+[2022-10-16 22:13:12] level=INFO |                  |   82 MB |   40 |
+[2022-10-16 22:13:12] level=INFO |-----------------------------------|
 ```
 
 ### Destination folders
