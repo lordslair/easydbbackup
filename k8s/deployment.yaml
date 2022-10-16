@@ -34,6 +34,17 @@ spec:
             memory: 16Mi
             cpu: 10m
         env:
+          # OUTPUT specifics
+          - name: LOG_INFO
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: log-info
+          - name: LOG_DATE
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: log-date
           # MySQL/MarisDB related variables
           - name: MYSQL_DUMP
             valueFrom:
