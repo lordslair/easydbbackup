@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM alpine:3.18
 MAINTAINER @Lordslair
 
 RUN apk update --no-cache \
