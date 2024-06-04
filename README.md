@@ -1,7 +1,7 @@
 # easydbbackup, the project :
 
 This project started to have a simple and lightweight container to :
-- backup MySQL/MariaDB, Redis, or SQLite databases
+- backup MongoDB, MySQL/MariaDB, Redis, or SQLite databases
 - export the dumps to a remote archive server accessible with rsync or rclone
 
 All of this inside Docker containers for portable purposes.  
@@ -15,6 +15,14 @@ We assume they are passed to the container in ENV
 Logging related variables:
 - `LOG_DATE`: boolean, to output current date in logs
 - `LOG_INFO`: boolean, to output loglevel in logs
+
+MongoDB server related variables :
+- `MONGODB_DUMP`: boolean, to execute this backup type
+- `MONGODB_EXPORT`: boolean, to export as JSON every Collection
+- `MONGO_DB_LIST`: is a list, representing the DB to backup
+- `MONGO_DB_HOST`: mongodb-server hostname or IP
+- `MONGO_DB_USER`: mongodb-server username
+- `MONGO_DB_PASS`: mongodb-server password
 
 MySQL/MariaDB server related variables :
 - `MYSQL_DUMP`: boolean, to execute this backup type
@@ -50,6 +58,14 @@ Hint: ALL the variables are mandatory
 Here are the outputs with ENV vars `LOG_INFO` and `LOG_DATE` set to `True`
 
 ```
+MongoDB version
+[2024-06-04 15:52:22] level=INFO | [hourly] mongodb-svc/my-database
+[2024-06-04 15:52:22] level=INFO | [hourly]  └> Exporting [✓]
+[2024-06-04 15:52:22] level=INFO | [hourly]  └>   Dumping [✓]
+[2024-06-04 15:52:22] level=INFO | [hourly]  └>   Zipping [✓]
+[2024-06-04 15:52:22] level=INFO | [hourly]  └>  Rcloning [✓]
+[2024-06-04 15:52:22] level=INFO | [hourly]  └>  Cleaning [✓]
+
 MySQL/MariaDB version
 [2022-10-16 22:58:40] level=INFO | [hourly] my-mysql-server/my-database
 [2022-10-16 22:58:40] level=INFO | [hourly]  └>  Dumping [✓]
@@ -80,26 +96,30 @@ SQLite version
 Once a day, a status will be displayed with Size used & number of zip files  
 This will occur, whether you use rsync or rclone
 ```
-[2022-10-16 22:12:41] level=INFO |-----------------------------------|
-[2022-10-16 22:12:41] level=INFO |        Remote Usage Status        |
-[2022-10-16 22:12:41] level=INFO |-----------------------------------|
-[2022-10-16 22:12:41] level=INFO |  Period | Engine |    Size | ZIPs |
-[2022-10-16 22:12:41] level=INFO |---------|--------|---------|------|
-[2022-10-16 22:12:41] level=INFO |  hourly |  MySQL |   58 MB |   21 |
-[2022-10-16 22:12:41] level=INFO |  hourly |  Redis |    0 MB |    7 |
-[2022-10-16 22:12:41] level=INFO |         |  TOTAL |   58 MB |   28 |
-[2022-10-16 22:12:54] level=INFO |   daily |  MySQL |    8 MB |    3 |
-[2022-10-16 22:12:54] level=INFO |   daily |  Redis |    0 MB |    1 |
-[2022-10-16 22:12:54] level=INFO |         |  TOTAL |    8 MB |    4 |
-[2022-10-16 22:13:03] level=INFO |  weekly |  MySQL |    8 MB |    3 |
-[2022-10-16 22:13:03] level=INFO |  weekly |  Redis |    0 MB |    1 |
-[2022-10-16 22:13:03] level=INFO |         |  TOTAL |    8 MB |    4 |
-[2022-10-16 22:13:12] level=INFO | monthly |  MySQL |    8 MB |    3 |
-[2022-10-16 22:13:12] level=INFO | monthly |  Redis |    0 MB |    1 |
-[2022-10-16 22:13:12] level=INFO |         |  TOTAL |    8 MB |    4 |
-[2022-10-16 22:13:12] level=INFO |---------|--------|---------|------|
-[2022-10-16 22:13:12] level=INFO |                  |   82 MB |   40 |
-[2022-10-16 22:13:12] level=INFO |-----------------------------------|
+level=INFO | |------------------------------------|
+level=INFO | |        Remote Usage Status         |
+level=INFO | |------------------------------------|
+level=INFO | |  Period | Engine  |    Size | ZIPs |
+level=INFO | |---------|---------|---------|------|
+level=INFO | |  hourly | MySQL   |  261 MB |   72 |
+level=INFO | |  hourly | Redis   |    0 MB |   24 |
+level=INFO | |  hourly | MongoDB |    0 MB |    4 |
+level=INFO | |         |  TOTAL  |  261 MB |  100 |
+level=INFO | |   daily | MySQL   |  338 MB |   92 |
+level=INFO | |   daily | Redis   |    0 MB |   30 |
+level=INFO | |   daily | MongoDB |    0 MB |    1 |
+level=INFO | |         |  TOTAL  |  338 MB |  123 |
+level=INFO | |  weekly | MySQL   |  296 MB |   61 |
+level=INFO | |  weekly | Redis   |    2 MB |   51 |
+level=INFO | |  weekly | MongoDB |    0 MB |    1 |
+level=INFO | |         |  TOTAL  |  298 MB |  113 |
+level=INFO | | monthly | MySQL   |   76 MB |   16 |
+level=INFO | | monthly | Redis   |    0 MB |   12 |
+level=INFO | | monthly | MongoDB |    0 MB |    1 |
+level=INFO | |         |  TOTAL  |   76 MB |   29 |
+level=INFO | |---------|---------|---------|------|
+level=INFO | |                   |  973 MB |  365 |
+level=INFO | |------------------------------------|
 ```
 
 ### Destination folders
@@ -110,6 +130,8 @@ the backups are stored in `PCA_DIR` (or `RCLONE_CONFIG_PCS_DIR`) are stored this
 ```
 .
 └── DIR
+    ├── MongoDB
+    │  └── ...
     ├── MySQL
     │  ├── daily
     │  │   └── $(date +%d)-dump-$(dbname).SQL.zip
