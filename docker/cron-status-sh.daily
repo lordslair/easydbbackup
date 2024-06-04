@@ -45,5 +45,5 @@ for PERIOD in hourly daily weekly monthly;do
     printf "$NOW$LOG|         |  TOTAL  | %4s MB | %4s |\n" $SIZET $FILET
 done;
 echo "$NOW$LOG|---------|---------|---------|------|"
-printf "$NOW$LOG|                  | %4s MB | %4s |\n" $SIZETT $FILETT
+printf "$NOW$LOG|                   | %4s MB | %4s |\n" $SIZETT $FILETT
 echo "$NOW$LOG|------------------------------------|"
