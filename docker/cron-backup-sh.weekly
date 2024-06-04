@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[[ $SQLITE_DUMP  == 'True' ]] && /usr/bin/backup-sqlite.sh  weekly
-[[ $REDIS_DUMP   == 'True' ]] && /usr/bin/backup-redis.sh   weekly
-[[ $MYSQL_DUMP   == 'True' ]] && /usr/bin/backup-mysql.sh   weekly
-[[ $MONGODB_DUMP == 'True' ]] && /usr/bin/backup-mongodb.sh weekly
+[[ $SQLITE_DUMP  == 'True' ]] && /usr/local/bin/backup-sqlite.sh  weekly
+[[ $REDIS_DUMP   == 'True' ]] && /usr/local/bin/backup-redis.sh   weekly
+[[ $MYSQL_DUMP   == 'True' ]] && /usr/local/bin/backup-mysql.sh   weekly
+[[ $MONGODB_DUMP == 'True' ]] && /usr/local/bin/backup-mongodb.sh weekly
