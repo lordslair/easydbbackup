@@ -7,11 +7,17 @@ COPY docker/cron-backup-sh.weekly  /etc/periodic/weekly/cron-backup-sh
 
 COPY docker/cron-status-sh.daily   /etc/periodic/daily/cron-status-sh
 
+COPY docker/backup-mongodb.sh      /usr/local/bin/backup-mongodb.sh
+COPY docker/backup-mysql.sh        /usr/local/bin/backup-mysql.sh
+COPY docker/backup-redis.sh        /usr/local/bin/backup-redis.sh
+COPY docker/backup-sqlite.sh       /usr/local/bin/backup-sqlite.sh
+
 RUN apk update --no-cache \
     && apk add --no-cache \
         "bash" \
         "mariadb-connector-c" \
         "mysql-client" \
+        "mongodb-tools" \
         "openssh" \
         "rclone" \
         "sqlite" \
