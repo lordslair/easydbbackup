@@ -22,16 +22,17 @@ for PERIOD in hourly daily weekly monthly;do
   FILET=0
 
     for ENGINE in SQLite MySQL Redis MongoDB;do
-        if [[ $RCLONE_CONFIG_PCS_TYPE == 'swift' ]]
-        then
-            SIZEB=$(rclone --quiet size pcs:"$RCLONE_CONFIG_PCS_DIR"/"$ENGINE"/"$PERIOD" | grep size | awk '{print $5}' | sed -e 's/(//')
-            FILES=$(rclone --quiet size pcs:"$RCLONE_CONFIG_PCS_DIR"/"$ENGINE"/"$PERIOD" | grep objects | awk '{print $3}')
-        else
+        if [[ $RCLONE_REMOTE_TYPE == 'swift' ]]; then
+            SIZEB=$(rclone --quiet size pcs:"$RCLONE_REMOTE_PATH"/"$ENGINE"/"$PERIOD" | grep size | awk '{print $5}' | sed -e 's/(//')
+            FILES=$(rclone --quiet size pcs:"$RCLONE_REMOTE_PATH"/"$ENGINE"/"$PERIOD" | grep objects | awk '{print $3}')
+        elif [[ $RCLONE_REMOTE_TYPE == 'rsync' ]]; then
             SIZEB=$(echo "ls -l" | sshpass -p "$PCA_PASS" sftp "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$ENGINE"/"$PERIOD" 2>1 | grep .zip | awk '{print $5}' | awk '{s+=$1} END {printf "%.0f\n", s}')
             FILES=$(echo "ls -l" | sshpass -p "$PCA_PASS" sftp "$PCA_USER"@"$PCA_HOST":"$PCA_DIR"/"$ENGINE"/"$PERIOD" 2>1 | grep -c .zip)
+        elif [[ $RCLONE_REMOTE_TYPE == 's3' ]]; then
+            SIZEB=$(rclone --quiet size s3backup:"$RCLONE_REMOTE_PATH"/"$ENGINE"/"$PERIOD" | grep size | awk '{print $5}' | sed -e 's/(//')
+            FILES=$(rclone --quiet size s3backup:"$RCLONE_REMOTE_PATH"/"$ENGINE"/"$PERIOD" | grep objects | awk '{print $3}')
         fi
-        if [[ $FILES > 0 ]]
-        then
+        if [[ $FILES > 0 ]]; then
           SIZEM=$(($SIZEB/1024/1024))
           SIZET=$(($SIZET + $SIZEM))
           FILET=$(($FILET + $FILES))
@@ -42,7 +43,9 @@ for PERIOD in hourly daily weekly monthly;do
         fi
     done;
 
-    printf "$NOW$LOG|         |  TOTAL  | %4s MB | %4s |\n" $SIZET $FILET
+    if [[ $FILET > 0 ]]; then
+        printf "$NOW$LOG|         |  TOTAL  | %4s MB | %4s |\n" $SIZET $FILET
+    fi
 done;
 echo "$NOW$LOG|---------|---------|---------|------|"
 printf "$NOW$LOG|                   | %4s MB | %4s |\n" $SIZETT $FILETT

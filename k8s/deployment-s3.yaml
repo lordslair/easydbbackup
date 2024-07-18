@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  namespace: my-project
+  name: backend-backup
+  labels:
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backup
+      tier: backend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: backup
+        tier: backend
+    spec:
+      restartPolicy: Always
+
+      containers:
+      - name: backend-backup
+        image: lordslair/easydbbackup:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            memory: 32Mi
+            cpu: 50m
+          requests:
+            memory: 16Mi
+            cpu: 10m
+        env:
+          # RCLONE specifics (remote)
+          - name: RCLONE_REMOTE_TYPE
+            value: 's3'
+          - name: RCLONE_REMOTE_PATH
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: remote-path
+          # RCLONE specifics (auth)
+          - name: RCLONE_CONFIG_S3BACKUP_TYPE
+            value: 's3'
+          - name: RCLONE_CONFIG_S3BACKUP_ENV_AUTH
+            value: 'false'
+          - name: RCLONE_CONFIG_S3BACKUP_PROVIDER
+            value: 'Other'
+          - name: RCLONE_CONFIG_S3BACKUP_ACL
+            value: 'private'
+          - name: RCLONE_CONFIG_S3BACKUP_ENDPOINT
+            value: 'https://s3.waw.io.cloud.ovh.net'
+          - name: RCLONE_CONFIG_S3BACKUP_REGION
+            value: 'waw'
+          - name: RCLONE_CONFIG_S3BACKUP_LOCATION_CONSTRAINT
+            value: 'waw'
+          - name: RCLONE_CONFIG_S3BACKUP_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: remote-s3-access-key
+          - name: RCLONE_CONFIG_S3BACKUP_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: remote-s3-secret-key
+
+          # MONGODB specifics
+          - name: MONGODB_DUMP
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: mongodb-dump
+          - name: MONGODB_EXPORT
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: mongodb-export
+          - name: MONGO_DB_LIST
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: mongodb-dblist
+          - name: MONGO_DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: my-mongodb-secret
+                key: mongodb-host
+          - name: MONGO_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: my-mongodb-secret
+                key: mongodb-user
+          - name: MONGO_DB_PASS
+            valueFrom:
+              secretKeyRef:
+                name: my-mongodb-secret
+                key: mongodb-pass
+
+          # OUTPUT specifics
+          - name: LOG_INFO
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: log-info
+          - name: LOG_DATE
+            valueFrom:
+              secretKeyRef:
+                name: my-backup-secret
+                key: log-date
