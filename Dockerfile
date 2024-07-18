@@ -12,6 +12,8 @@ COPY docker/backup-mysql.sh        /usr/local/bin/backup-mysql.sh
 COPY docker/backup-redis.sh        /usr/local/bin/backup-redis.sh
 COPY docker/backup-sqlite.sh       /usr/local/bin/backup-sqlite.sh
 
+COPY docker/_backup-zip-push-clean.sh /usr/local/bin/_backup-zip-push-clean.sh
+
 RUN apk update --no-cache \
     && apk add --no-cache \
         "bash" \
