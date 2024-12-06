@@ -1,4 +1,4 @@
-FROM alpine:3.20
+FROM alpine:3.21
 
 COPY docker/cron-backup-sh.daily   /etc/periodic/daily/cron-backup-sh
 COPY docker/cron-backup-sh.hourly  /etc/periodic/hourly/cron-backup-sh
